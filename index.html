@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Mukilan</title>
+  <!-- Bootstrap 5 CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome 6 (social icons + micro interactions) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Google Fonts: Space Grotesk for futuristic vibe -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      cursor: none; /* Hide default cursor for custom star cursor */
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: radial-gradient(circle at 20% 30%, #0a0f1f, #03050b);
+      color: #f0f3ff;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* ---- Custom STAR Cursor (animated) ---- */
+    .star-cursor {
+      position: fixed;
+      width: 32px;
+      height: 32px;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.08s linear;
+      filter: drop-shadow(0 0 6px #ffd966) drop-shadow(0 0 12px #ffaa33);
+      animation: starPulse 1.2s infinite alternate ease-in-out;
+    }
+    .star-cursor i {
+      font-size: 32px;
+      color: #ffdf7e;
+      text-shadow: 0 0 8px #ffb347;
+      animation: starRotate 2s infinite linear;
+    }
+    @keyframes starPulse {
+      0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.9; }
+      100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+    }
+    @keyframes starRotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ---- Glassmorphism / Glow Effects ---- */
+    .glass-card {
+      background: rgba(15, 25, 45, 0.45);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(100, 150, 255, 0.25);
+      border-radius: 28px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(80, 140, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+    .glass-card:hover {
+      border-color: rgba(80, 160, 255, 0.6);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 15px rgba(80, 150, 255, 0.4);
+      transform: translateY(-5px);
+    }
+    .glow-text {
+      text-shadow: 0 0 8px rgba(0, 200, 255, 0.5);
+    }
+    .btn-glow {
+      background: linear-gradient(90deg, #1e2a5e, #0f172f);
+      border: none;
+      padding: 10px 28px;
+      border-radius: 40px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: 0.2s;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 160, 255, 0.2);
+    }
+    .btn-glow:hover {
+      transform: scale(1.02);
+      background: linear-gradient(90deg, #2a3b7a, #172045);
+      box-shadow: 0 8px 22px rgba(0, 180, 255, 0.4);
+      color: white;
+    }
+    .profile-img {
+      width: 260px;
+      height: 260px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid rgba(100, 180, 255, 0.7);
+      box-shadow: 0 0 35px rgba(70, 150, 255, 0.6);
+      transition: 0.4s;
+    }
+    .profile-img:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 50px rgba(100, 180, 255, 0.9);
+    }
+    /* Navbar Styling */
+    .navbar-sticky {
+      background: rgba(8, 12, 25, 0.75);
+      backdrop-filter: blur(14px);
+      transition: all 0.3s;
+      border-bottom: 1px solid rgba(72, 187, 255, 0.2);
+    }
+    .navbar-nav .nav-link {
+      color: #eef5ff !important;
+      font-weight: 500;
+      margin: 0 6px;
+      transition: 0.2s;
+      position: relative;
+    }
+    .navbar-nav .nav-link:hover, .navbar-nav .nav-link.active {
+      color: #7bc3ff !important;
+      text-shadow: 0 0 4px #3e9eff;
+    }
+    .navbar-nav .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 10%;
+      width: 80%;
+      height: 2px;
+      background: #3e9eff;
+      border-radius: 4px;
+      box-shadow: 0 0 6px #00a6ff;
+    }
+    /* Scroll reveal animations */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px) scale(0.96);
+      transition: all 0.7s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-35px);
+      transition: all 0.6s ease;
+    }
+    .reveal-left.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(35px);
+      transition: all 0.6s ease;
+    }
+    .reveal-right.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    /* Skills progress bars custom */
+    .skill-progress {
+      background: rgba(255,255,255,0.1);
+      border-radius: 40px;
+      height: 12px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .skill-progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #a855f7);
+      border-radius: 40px;
+      transition: width 1.2s cubic-bezier(0.22, 0.97, 0.36, 1);
+      box-shadow: 0 0 6px #6b8cff;
+    }
+    /* Project Cards */
+    .project-card {
+      background: rgba(20, 30, 55, 0.6);
+      backdrop-filter: blur(8px);
+      border-radius: 24px;
+      padding: 1.2rem;
+      transition: 0.3s;
+      border: 1px solid rgba(0, 150, 255, 0.2);
+    }
+    .project-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      background: rgba(30, 45, 80, 0.7);
+      border-color: #3b82f6;
+      box-shadow: 0 25px 35px -12px rgba(0, 160, 255, 0.3);
+    }
+    /* Floating shapes */
+    .floating-shape {
+      position: fixed;
+      background: radial-gradient(circle, rgba(59,130,246,0.25), rgba(139,92,246,0.1));
+      border-radius: 50%;
+      filter: blur(55px);
+      z-index: -1;
+      pointer-events: none;
+      animation: floatAround 18s infinite alternate ease-in-out;
+    }
+    @keyframes floatAround {
+      0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+      100% { transform: translate(50px, -40px) scale(1.2); opacity: 0.8; }
+    }
+    /* Social icons in footer */
+    .footer-social {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      margin: 20px 0 15px;
+    }
+    .footer-social a {
+      font-size: 28px;
+      color: #ccdeff;
+      transition: 0.2s;
+    }
+    .footer-social a:hover {
+      color: #4c9eff;
+      transform: translateY(-4px) scale(1.1);
+      text-shadow: 0 0 8px #3e9eff;
+    }
+    @media (max-width: 768px) {
+      .profile-img { width: 180px; height: 180px; }
+      .star-cursor { display: none; } /* fallback on touch devices */
+      body { cursor: auto; }
+      a, button { cursor: pointer; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Custom Star Cursor Element -->
+<div class="star-cursor" id="starCursor">
+  <i class="fas fa-star"></i>
+</div>
+
+<!-- Floating background shapes (particle-like) -->
+<div class="floating-shape" style="width: 300px; height: 300px; top: 10%; left: -5%; animation-duration: 22s;"></div>
+<div class="floating-shape" style="width: 450px; height: 450px; bottom: 5%; right: -10%; background: radial-gradient(circle, rgba(168,85,247,0.2), rgba(59,130,246,0.05)); animation-duration: 25s;"></div>
+<div class="floating-shape" style="width: 200px; height: 200px; top: 60%; left: 80%; animation-duration: 16s; filter: blur(40px);"></div>
+<div class="floating-shape" style="width: 350px; height: 350px; bottom: 20%; left: 5%; background: radial-gradient(circle, rgba(0,200,255,0.2), rgba(0,100,255,0.05)); animation-duration: 20s;"></div>
+
+<!-- Sticky Navbar with smooth scrolling (no contact link) -->
+<nav class="navbar navbar-expand-lg navbar-sticky fixed-top py-2">
+  <div class="container">
+    <a class="navbar-brand fw-bold fs-4 text-white" href="#">MUKILAN<span style="color:#3b82f6;">.dev</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="#skills">Skills</a></li>
+        <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="container mt-5 pt-5">
+  <!-- Hero Section (clock removed) -->
+  <section id="home" class="row align-items-center min-vh-100 py-5 gy-5">
+    <div class="col-lg-6 col-md-12 order-lg-1 order-2 reveal-left">
+      <h1 class="display-2 fw-bold" style="background: linear-gradient(135deg, #fff, #7bc3ff); -webkit-background-clip: text; background-clip: text; color: transparent;">Mukilan</h1>
+      <h2 class="display-6 fw-semibold mb-3">Web Developer <span class="glow-text">⚡</span></h2>
+      <p class="lead mb-3">Crafting futuristic web experiences with HTML, CSS & JavaScript. Pixel-perfect, blazing fast, and immersive.</p>
+      <div class="fs-4 mb-4">✨ <span id="typing-skills"></span><span class="blinking-cursor">|</span></div>
+      <a href="#projects" class="btn btn-glow me-3 mt-2"><i class="fas fa-rocket me-2"></i>Explore Work</a>
+    </div>
+    <div class="col-lg-6 col-md-12 text-center order-lg-2 order-1 reveal-right">
+      <img class="profile-img" src="WhatsApp Image 2026-03-30 at 5.17.28 PM.jpeg" alt="Mukilan Profile">
+      <div class="mt-3 d-flex justify-content-center gap-3">
+        <i class="fab fa-html5 fa-2x" style="color:#e96228;"></i>
+        <i class="fab fa-css3-alt fa-2x" style="color:#264de4;"></i>
+        <i class="fab fa-js fa-2x" style="color:#f7df1e;"></i>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="py-5 reveal">
+    <div class="glass-card p-4 p-lg-5">
+      <h2 class="display-5 fw-bold mb-4"><i class="fas fa-user-astronaut me-2"></i> About Me</h2>
+      <div class="row">
+        <div class="col-md-8">
+          <p class="fs-5">I'm Mukilan, a passionate Web Developer who thrives at the intersection of design and code. With deep expertise in modern frontend technologies, I build responsive, high-performance web apps that leave a mark. Constantly exploring new tech like WebGL, React.</p>
+          <p class="fs-6 text-light-50"></p>
+        </div>
+        <div class="col-md-4">
+          <div class="d-flex flex-wrap gap-3 mt-3">
+            <span class="badge bg-primary p-3"><i class="fas fa-code"></i> 1+ yrs exp</span>
+            <span class="badge bg-secondary p-3"><i class="fas fa-globe"></i> 4 projects</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills Section (animated progress bars) -->
+  <section id="skills" class="py-5 reveal">
+    <h2 class="display-5 fw-bold text-center mb-5"><i class="fas fa-cogs me-2"></i> Technical Arsenal</h2>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="glass-card p-4 h-100">
+          <div class="d-flex justify-content-between"><span class="fw-bold fs-5"><i class="fab fa-html5 me-2"></i>HTML5</span><span>95%</span></div>
+          <div class="skill-progress"><div class="skill-progress-bar" data-width="95"></div></div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="glass-card p-4 h-100">
+          <div class="d-flex justify-content-between"><span class="fw-bold fs-5"><i class="fab fa-css3-alt me-2"></i>CSS3</span><span>90%</span></div>
+          <div class="skill-progress"><div class="skill-progress-bar" data-width="90"></div></div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="glass-card p-4 h-100">
+          <div class="d-flex justify-content-between"><span class="fw-bold fs-5"><i class="fab fa-js me-2"></i>JavaScript</span><span>88%</span></div>
+          <div class="skill-progress"><div class="skill-progress-bar" data-width="88"></div></div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="glass-card p-4 h-100">
+          <div class="d-flex justify-content-between"><span class="fw-bold fs-5"><i class="fab fa-react me-2"></i>React</span><span>82%</span></div>
+          <div class="skill-progress"><div class="skill-progress-bar" data-width="82"></div></div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="glass-card p-4 h-100">
+          <div class="d-flex justify-content-between"><span class="fw-bold fs-5"><i class="fab fa-bootstrap me-2"></i>Bootstrap</span><span>90%</span></div>
+          <div class="skill-progress"><div class="skill-progress-bar" data-width="90"></div></div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="glass-card p-4 h-100">
+          <div class="d-flex justify-content-between"><span class="fw-bold fs-5"><i class="fas fa-database me-2"></i>UI/UX</span><span>85%</span></div>
+          <div class="skill-progress"><div class="skill-progress-bar" data-width="85"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects Section -->
+  <section id="projects" class="py-5 reveal">
+    <h2 class="display-5 fw-bold text-center mb-5"><i class="fas fa-laptop-code me-2"></i>Featured Projects</h2>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="project-card h-100">
+          <i class="fas fa-chart-line fa-3x mb-3" style="color:#3b82f6;"></i>
+          <h4>Real time blood donar finder</h4>
+          <p>find blood donars easly</p>
+          <span class="badge bg-dark">React</span> <span class="badge bg-dark">js</span>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="project-card h-100">
+          <i class="fas fa-gamepad fa-3x mb-3" style="color:#a855f7;"></i>
+          <h4>Farmer companion</h4>
+          <p>easy way to buy and sells the seeds </p>
+          <span class="badge bg-dark">JavaScript</span> <span class="badge bg-dark">react</span>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="project-card h-100">
+          <i class="fas fa-meteor fa-3x mb-3" style="color:#f97316;"></i>
+          <h4>Portfolio</h4>
+          <p>3D animated portfolio concept with and glassmorphism transitions.</p>
+          <span class="badge bg-dark">node.js</span> <span class="badge bg-dark">css</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="text-center py-4 mt-3">
+  <div class="footer-social">
+    <a href="https://github.com/mukilan-2026" class="social-icon" aria-label="GitHub"><i class="fab fa-github"></i></a>
+    <a href="https://www.linkedin.com/in/s-mukilan-2a8b39370?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+    <a href="#" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+    <a href="https://www.instagram.com/anbilmukill?igsh=MTFtdHAzbjJxcWo4Zg==" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+  </div>
+  <p class="mb-0">© 2026 Mukilan <i class="fas fa-moon text-warning"></i> </p>
+</footer>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // 1. STAR CURSOR SMOOTH FOLLOW
+  const starCursor = document.getElementById('starCursor');
+  document.addEventListener('mousemove', (e) => {
+    if (window.innerWidth > 768) {
+      starCursor.style.left = e.clientX + 'px';
+      starCursor.style.top = e.clientY + 'px';
+    }
+  });
+  document.addEventListener('mouseleave', () => {
+    if (starCursor) starCursor.style.opacity = '0';
+  });
+  document.addEventListener('mouseenter', () => {
+    if (starCursor) starCursor.style.opacity = '1';
+  });
+
+  // 2. TYPING EFFECT (Skills: HTML, CSS, JavaScript)
+  const skillsArray = ["HTML", "CSS", "JavaScript", "React", "Bootstrap", "UI/UX"];
+  let skillIndex = 0;
+  let charIndex = 0;
+  let isDeleting = false;
+  const typingSpan = document.getElementById("typing-skills");
+  function typeEffect() {
+    const currentSkill = skillsArray[skillIndex];
+    if (isDeleting) {
+      typingSpan.innerText = currentSkill.substring(0, charIndex-1);
+      charIndex--;
+    } else {
+      typingSpan.innerText = currentSkill.substring(0, charIndex+1);
+      charIndex++;
+    }
+    if (!isDeleting && charIndex === currentSkill.length) {
+      isDeleting = true;
+      setTimeout(typeEffect, 1500);
+      return;
+    }
+    if (isDeleting && charIndex === 0) {
+      isDeleting = false;
+      skillIndex = (skillIndex + 1) % skillsArray.length;
+      setTimeout(typeEffect, 300);
+      return;
+    }
+    const speed = isDeleting ? 50 : 100;
+    setTimeout(typeEffect, speed);
+  }
+  typeEffect();
+
+  // 3. SCROLL REVEAL (Intersection Observer) + Animated Progress Bars on reveal
+  const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+        // If skills section becomes visible, fill progress bars
+        if (entry.target.id === 'skills' || entry.target.closest('#skills')) {
+          document.querySelectorAll('.skill-progress-bar').forEach(bar => {
+            const width = bar.getAttribute('data-width');
+            if (width && !bar.style.width) {
+              bar.style.width = width + '%';
+            }
+          });
+        }
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2, rootMargin: "0px 0px -60px 0px" });
+  revealElements.forEach(el => observer.observe(el));
+  // additionally observe progress bars individually
+  const skillSection = document.querySelector('#skills');
+  if (skillSection) observer.observe(skillSection);
+  const progressObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const bars = entry.target.querySelectorAll('.skill-progress-bar');
+        bars.forEach(bar => {
+          const w = bar.getAttribute('data-width');
+          if (w && !bar.style.width) bar.style.width = w + '%';
+        });
+        progressObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.4 });
+  document.querySelectorAll('.glass-card').forEach(card => {
+    if (card.querySelector('.skill-progress-bar')) progressObserver.observe(card);
+  });
+
+  // 4. Navbar Active Link Highlight on scroll (smooth spy)
+  const sections = document.querySelectorAll('section');
+  const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    const scrollPos = window.scrollY + 150;
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      const sectionHeight = section.clientHeight;
+      if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+        current = section.getAttribute('id');
+      }
+    });
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === `#${current}`) {
+        link.classList.add('active');
+      }
+    });
+  });
+  // Smooth scroll for nav links
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = link.getAttribute('href').substring(1);
+      const targetElem = document.getElementById(targetId);
+      if (targetElem) {
+        targetElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // 5. Force progress bars fill when skills section enters (fallback)
+  const checkSkillsFill = () => {
+    const skillSec = document.getElementById('skills');
+    if(skillSec && skillSec.getBoundingClientRect().top < window.innerHeight-100) {
+      document.querySelectorAll('.skill-progress-bar').forEach(bar => {
+        const widthVal = bar.getAttribute('data-width');
+        if(widthVal && !bar.style.width) bar.style.width = widthVal + '%';
+      });
+    }
+  };
+  window.addEventListener('load', checkSkillsFill);
+  window.addEventListener('scroll', checkSkillsFill);
+</script>
+</body>
+</html>
